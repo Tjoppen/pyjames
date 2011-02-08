@@ -54,8 +54,8 @@ GENERATE_BUILTIN_NONCONST(ByteClass, "byte", "char")
 };
 
 GENERATE_BUILTIN_NONCONST(UnsignedByteClass, "unsignedByte", "unsigned char")
-    virtual std::string generateElementSetter(std::string memberName, std::string nodeName, std::string tabs) const;
-    virtual std::string generateAttributeSetter(std::string memberName, std::string attributeName, std::string tabs) const;
+    //virtual std::string generateElementSetter(std::string memberName, std::string nodeName, std::string tabs) const;
+    //virtual std::string generateAttributeSetter(std::string memberName, std::string attributeName, std::string tabs) const;
     virtual std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const;
     virtual std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const;
 };
@@ -73,15 +73,45 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
     }
 
     std::string generateElementSetter(std::string memberName, std::string nodeName, std::string tabs) const {
-        return tabs + "{ XercesString " + tempWithPostfix + "(" + memberName + "); " + nodeName + "->setTextContent(" + tempWithPostfix + "); }";
+        std::ostringstream oss;
+       
+        oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << std::endl;
+        oss << tabs << "tmpText = document.createTextNode(str(" << memberName << "))" << std::endl;
+        oss << tabs << "tmp.appendChild(tmpText)" << std::endl;
+        oss << tabs << "node.appendChild(tmp)" << std::endl;
+    
+        return oss.str();
     }
 
     std::string generateAttributeSetter(std::string memberName, std::string attributeName, std::string tabs) const {
-        return tabs + "{ XercesString " + tempWithPostfix + "(" + memberName + "); " + attributeName + "->setValue(" + tempWithPostfix + "); }";
+        std::ostringstream oss;
+    
+        oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
+    	oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+    	oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
+    
+        return oss.str();
     }
 
     std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const {
-        return tabs + memberName + " = XercesString(" + nodeName + "->getTextContent());";
+        std::ostringstream oss;
+
+        oss << tabs << memberName << " = ";
+        std::string type = getClassname();
+        if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+        	oss << "int(node.firstChild.nodeValue)";
+        } else if(type == "long" || type == "unsignedLong") {
+        	oss << "long(node.firstChild.nodeValue)";
+        } else if(type == "float" || type == "double") {
+        	oss << "float(node.firstChild.nodeValue)";
+        } else if(type == "string") {
+        	oss << "node.firstChild.nodeValue";
+        } else {
+        	oss << "str(node.firstChild.nodeValue)";
+        }
+        oss << std::endl;
+
+        return oss.str();
     }
 
     std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const {
@@ -94,23 +124,32 @@ GENERATE_BUILTIN_NONCONST(DoubleClass, "double", "double")};
 
 GENERATE_BUILTIN_NONCONST(BooleanClass, "boolean", "bool")
     std::string generateElementSetter(std::string memberName, std::string nodeName, std::string tabs) const {
-        return tabs + "{ XercesString " + tempWithPostfix + "(" + memberName + " ? \"true\" : \"false\"); " + nodeName + "->setTextContent(" + tempWithPostfix + "); }";
+        std::ostringstream oss;
+        
+        oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << std::endl;
+        if(getClassname() == "bool") {
+            oss << tabs << "tmpText = document.createTextNode(str(" << memberName << ").lower())" << std::endl;
+        } else {
+            oss << tabs << "tmpText = document.createTextNode(str(" << memberName << "))" << std::endl;
+        }
+        oss << tabs << "tmp.appendChild(tmpText)" << std::endl;
+        oss << tabs << "node.appendChild(tmp)" << std::endl;
+    
+        return oss.str();
     }
 
     std::string generateAttributeSetter(std::string memberName, std::string attributeName, std::string tabs) const {
-        return tabs + "{ XercesString " + tempWithPostfix + "(" + memberName + " ? \"true\" : \"false\"); " + attributeName + "->setValue(" + tempWithPostfix + "); }";
+        std::ostringstream oss;
+    
+        oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
+    	oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+    	oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
+    
+        return oss.str();
     }
 
     std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const {
-        std::ostringstream oss;
-
-        oss << tabs << "{" << std::endl;
-        oss << tabs << "//TODO: Strip string prior to this?" << std::endl;
-        oss << tabs << "XercesString " << tempWithPostfix << "(" << nodeName << "->getTextContent());" << std::endl;
-        oss << tabs << memberName << " = " << tempWithPostfix << " == \"true\" || " << tempWithPostfix << " == \"1\";" << std::endl;
-        oss << tabs << "}" << std::endl;
-
-        return oss.str();
+        return tabs + memberName + " = bool(node.firstChild.nodeValue)";
     }
 
     std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const {

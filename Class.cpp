@@ -25,6 +25,8 @@ const string tempWithPostfix = "temp" + variablePostfix;
 const string convertedWithPostfix = "converted" + variablePostfix;
 const string ssWithPostfix = "ss" + variablePostfix;
 
+const string t = "    "; // Python indentation step (four spaces)
+
 Class::Class(FullName name, ClassType type) : name(name), type(type), 
         isDocument(false), base(NULL)  {
 }
@@ -59,10 +61,7 @@ void Class::addConstructor(const Constructor& constructor) {
 
 void Class::doPostResolveInit() {
     //figure out which constructors we need
-    if(generateDefaultCtor)             addConstructor(Constructor(this));
-    if(generateRequiredCtor)            addConstructor(Constructor(this, false, false));
-    if(generateRequiredAndVectorsCtor)  addConstructor(Constructor(this, true,  false));
-    if(generateAllCtor)                 addConstructor(Constructor(this, true,  true));
+    addConstructor(Constructor(this, true,  true));
 
     if(constructors.size() == 0)
         throw runtime_error("No constructors in class " + getClassname());
@@ -101,61 +100,61 @@ void Class::addMember(Member memberInfo) {
 string Class::generateAppender() const {
     ostringstream oss;
 
+	oss << t << endl;
+    oss << t << "def append_children(self, node, document):" << endl;
     if(base) {
         if(base->isSimple()) {
             //simpleContent
-            oss << base->generateElementSetter("content", nodeWithPostfix, "\t") << endl;
+		    oss << t << t << "tmpText = document.createTextNode(str(self.content))" << endl;
+		    oss << t << t << "node.appendChild(tmpText)" << endl;
         } else {
             //call base appender
-            oss << "\t" << base->getClassname() << "::appendChildren(" << nodeWithPostfix << ");" << endl;
+            oss << t << t << base->getClassname() << ".append_children(self, node, document);" << endl;
         }
-    }
-    
+    } 
     for(std::list<Member>::const_iterator it = members.begin(); it != members.end(); it++) {
         string name = it->name;
         string setterName = it->name;
         string nodeName = name + "Node";
+        string et = t+t; // Extra tabs
+        string subName = "self." + name;
 
         if(it != members.begin())
             oss << endl;
 
+		if(it->isOptional()) {
+            oss << et << "if self." << name << " != None:" << endl;
+            et = et + t;
+        }
         if(it->isArray()) {
-            string itName = "it" + variablePostfix;
-            setterName = "(*" + itName + ")";
-            oss << "\tfor(std::vector<" << it->cl->getClassname() << ">::const_iterator " << itName << " = " << name << ".begin(); " << itName << " != " << name << ".end(); " << itName << "++)" << endl;
-        } else if(it->isOptional()) {
-            //insert a non-null check
-            setterName += ".get()";
-            oss << "\tif(" << name << ".isSet())" << endl;
-        }
-
-        oss << "\t{" << endl;
-
+            oss << et << "if len(self." << name << ") > 0:" << endl;
+            et = et + t;
+			oss << et << "for value in self." << name << ":" << endl;
+            subName = "value";
+            et = et + t;
+        } 
+       	
         if(it->isAttribute) {
-            //attribute
-            oss << "\t\tXercesString " << tempWithPostfix << "(\"" << name << "\");" << endl;
-            oss << "\t\tDOMAttr *" << nodeName << " = " << nodeWithPostfix << "->getOwnerDocument()->createAttribute(" << tempWithPostfix << ");" << endl;
-            oss << it->cl->generateAttributeSetter(setterName, nodeName, "\t\t") << endl;
-            oss << "\t\t" << nodeWithPostfix << "->setAttributeNode(" << nodeName << ");" << endl;
-        } else {
+    		//attribute
+            oss << it->cl->generateAttributeSetter(name, subName, et);
+		} else {
             //element
-            oss << "\t\tXercesString " << tempWithPostfix << "(\"" << name << "\");" << endl;
-            oss << "\t\tDOMElement *" << nodeName << " = " << nodeWithPostfix << "->getOwnerDocument()->createElement(" << tempWithPostfix << ");" << endl;
-            oss << it->cl->generateElementSetter(setterName, nodeName, "\t\t") << endl;
-            oss << "\t\t" << nodeWithPostfix << "->appendChild(" << nodeName << ");" << endl;
+            oss << it->cl->generateElementSetter(subName, name, et);
         }
-
-        oss << "\t}" << endl;
     }
 
     return oss.str();
 }
 
 string Class::generateElementSetter(string memberName, string nodeName, string tabs) const {
+    ostringstream oss;
     if(isSimple() && base)
         return base->generateElementSetter(memberName, nodeName, tabs);
 
-    return tabs + memberName + ".appendChildren(" + nodeName + ");";
+    oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << endl;
+	oss << tabs << "node.appendChild(tmp)" << endl;
+    oss << tabs << memberName << ".append_children(tmp, document)" << endl;
+    return oss.str();
 }
 
 string Class::generateAttributeSetter(string memberName, string attributeName, string tabs) const {
@@ -170,22 +169,22 @@ string Class::generateParser() const {
     string childName = "child" + variablePostfix;
     string nameName = "name" + variablePostfix;
 
+	oss << t << endl;
+    oss << t << "def parse_node(self, node):" << endl;
+
     if(base) {
         if(base->isSimple()) {
             //simpleContent
-            oss << base->generateMemberSetter("content", nodeWithPostfix, "\t") << endl;
+            oss << base->generateMemberSetter("self.content", "content", t+t) << endl;
         } else {
-            oss << "\t" << base->getClassname() << "::parseNode(" << nodeWithPostfix << ");" << endl;
+            oss << t << t << base->getClassname() << ".parse_node(self, node)" << endl;
         }
-
-        oss << endl;
     }
-
-    oss << "\tfor(DOMNode *" << childName << " = " << nodeWithPostfix << "->getFirstChild(); " << childName << "; " << childName << " = " << childName << "->getNextSibling()) {" << endl;
-    oss << "\t\tif(!" << childName << "->getLocalName())" << endl;
-    oss << "\t\t\tcontinue;" << endl;
-    oss << endl;
-    oss << "\t\tXercesString " << nameName << "(" << childName << "->getLocalName());" << endl;
+	
+	oss << endl;
+    oss << t << t << "for childNode in node.childNodes:" << endl;
+    oss << t << t << t << "if childNode.localName == None:" << endl;
+    oss << t << t << t << t << "continue" << endl;
     oss << endl;
 
     //TODO: replace this with a map<pair<string, DOMNode::ElementType>, void(*)(DOMNode*)> thing?
@@ -199,55 +198,55 @@ string Class::generateParser() const {
             else
                 oss << endl;
 
-            oss << "\t\tif(" << nameName << " == \"" << it->name << "\" && " << childName << "->getNodeType() == DOMNode::ELEMENT_NODE) {" << endl;
-
-            string memberName = it->name;
-            if(!it->isRequired()) {
-                memberName += tempWithPostfix;
-                oss << "\t\t\t" << it->cl->getClassname() << " " << memberName << ";" << endl;
+            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE:" << endl;
+            
+            oss << t << t << t << t << "self." << it->name;
+			if(it->isArray()) {
+				oss << ".append(";
+			} else {
+				oss << " = ";
+			}
+            string type = it->type.second;
+            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+				oss << "int(childNode.firstChild.nodeValue)";
+            } else if(type == "long" || type == "unsignedLong") {
+				oss << "long(childNode.firstChild.nodeValue)";
+            } else if(type == "float" || type == "double") {
+				oss << "float(childNode.firstChild.nodeValue)";
+            } else if(type == "boolean") {
+            	oss << "self.strToBool(childNode.firstChild.nodeValue)";
+			} else if(type == "string" || type == "anyURI") {
+				oss << "str(childNode.firstChild.nodeValue)";
+            } else {
+                oss << type << ".fromNode(childNode)";
             }
-
-            string childElementName = "childElement" + variablePostfix;
-            oss << "\t\t\tDOMElement *" << childElementName << " = dynamic_cast<DOMElement*>(" << childName << ");" << endl;
-            oss << it->cl->generateMemberSetter(memberName, childElementName, "\t\t\t");
-
-            if(it->isArray()) {
-                oss << "\t\t\t" << it->name << ".push_back(" << memberName << ");" << endl;
-            } else if(it->isOptional()) {
-                oss << "\t\t\t" << it->name << " = " << memberName << ";" << endl;
-            }
-
-            oss << "\t\t}" << endl;
+			
+			if(it->isArray()) {
+				oss << ")" << endl;
+			} else {
+				oss << endl;
+			}
         }
     }
-
-    oss << "\t}" << endl;
 
     //attributes
     for(std::list<Member>::const_iterator it = members.begin(); it != members.end(); it++) {
         if(it->isAttribute) {
-            string attributeNodeName = "attributeNode" + variablePostfix;
+			oss << t << t << endl;
+			oss << t << t << "if node.hasAttribute(\"" << it->name << "\"):" << endl;
+			oss << t << t << t << "self." << it->name << " = ";
 
-            oss << "\t{" << endl;
-            oss << "\t\tXercesString " << tempWithPostfix << "(\"" << it->name << "\");" << endl;
-            oss << "\t\tif(" << nodeWithPostfix << "->hasAttribute(" << tempWithPostfix << ")) {" << endl;
-            oss << "\t\t\tDOMAttr *" << attributeNodeName << " = " << nodeWithPostfix << "->getAttributeNode(" << tempWithPostfix << ");" << endl;
-
-            string attributeName = it->name;
-
-            if(it->isOptional()) {
-                attributeName += "Temp";
-                oss << "\t\t\t" << it->cl->getClassname() << " " << attributeName << ";" << endl;
-            }
-
-
-            oss << it->cl->generateAttributeParser(attributeName, attributeNodeName, "\t\t\t") << endl;
-
-            if(it->isOptional()) {
-                oss << "\t\t\t" << it->name << " = " << attributeName << ";" << endl;
-            }
-
-            oss << "\t\t}" << endl << "\t}" << endl;
+            string type = it->type.second;
+            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+				oss << "int(";
+            } else if(type == "long" || type == "unsignedLong") {
+				oss << "long(";
+            } else if(type == "float" || type == "double") {
+				oss << "float(";
+            } else  {
+				oss << "str(";
+            } 
+			oss << "node.getAttribute(\"" << it->name << "\"))" << endl;
         }
     }
 
@@ -260,7 +259,7 @@ string Class::generateMemberSetter(string memberName, string nodeName, string ta
 
     ostringstream oss;
 
-    oss << tabs << memberName << ".parseNode(" << nodeName << ");" << endl;
+    oss << tabs << memberName << ".parse_node(node);" << endl;
 
     return oss.str();
 }
@@ -289,75 +288,75 @@ bool Class::hasHeader() const {
 
 void Class::writeImplementation(ostream& os) const {
     ClassName className = name.second;
+	
+	os << "from JamesXMLObject import *" << endl;
 
-    os << "#include <sstream>" << endl;
-    os << "#include <xercesc/dom/DOMDocument.hpp>" << endl;
-    os << "#include <xercesc/dom/DOMElement.hpp>" << endl;
-    os << "#include <xercesc/dom/DOMAttr.hpp>" << endl;
-    os << "#include <libjames/XercesString.h>" << endl;
-    os << "#include \"" << className << ".h\"" << endl;
+	
+	// Create class with inheritance
+    if(isDocument) {
+		os << "from " << base->getClassname() << " import *" << endl << endl;
+    	os << "class " << className << "(" << base->getClassname() << ", JamesXMLObject):";
+    } else if(base && !base->isSimple()) {
+		os << "from " << base->getClassname() << " import *" << endl << endl;
+    	os << "class " << className << "(" << base->getClassname() << "):";
+    } else {
+    	os << endl << "class " << className << "(JamesXMLObject):";
+	}
+	
+    //not much implementation needed for simple types
+    if(isSimple()) {
+	    os << t << endl;
+        os << t << "def __init__(self, content = None):" << endl;
+        os << t << t << "self.content = content" << endl;
+	    os << t << endl;
+        os << t << "def __str__(self):" << endl;
+        os << t << t << "return str(self.content)" << endl;
+		
+    } else {
+		// Create constructor
+		os << t << endl;
+    	constructors.back().writeBody(os);
+	
+	}
+	//Factory methods
+	os << t << endl;
+	os << t << "@classmethod" << endl;
+	os << t << "def fromNode(cls, node):" << endl;
+	os << t << t << "obj = cls()" << endl;
+	os << t << t << "obj.parse_node(node)" << endl;
+	os << t << t << "return obj" << endl;
 
-    //no implementation needed for simple types
-    if(isSimple())
-        return;
+	os << t << endl;
+	os << t << "@classmethod" << endl;
+	os << t << "def fromXML(cls, filename):" << endl;
+	os << t << t << "obj = cls()" << endl;
+	os << t << t << "obj.parsexml(filename)" << endl;
+	os << t << t << "return obj" << endl;
 
-    os << endl;
-    os << "using namespace std;" << endl;
-    os << "using namespace xercesc;" << endl;
-    os << "using namespace james;" << endl;
-    os << endl;
+    //get_name()
+	os << t << endl;
+    os << t << "def " << "get_name(self):" << endl;
+    os << t << t <<"return \"" << className << "\"" << endl;
 
-    //constructors
-    for(list<Constructor>::const_iterator it = constructors.begin(); it != constructors.end(); it++) {
-        it->writeBody(os);
-        os << endl;
-    }
+    //get_namespace()
+	os << t << endl;
+    os << t << "def " << "get_namespace(self):" << endl;
+    os << t << t <<"return \"" << name.first << "\"" << endl;
 
-    //method implementations
-    //unmarshalling constructors
-    if(base && !base->isSimple())
-        os << className << "::" << className << "(std::istream& is) : " << base->getClassname() << "() {" << endl;
-    else
-        os << className << "::" << className << "(std::istream& is) {" << endl;
-
-    os << "\tis >> *this;" << endl;
-    os << "}" << endl;
-    os << endl;
-
-    //factory method
-    os << className << " " << className << "::fromString(const std::string& str) {" << endl;
-    os << "\tistringstream iss(str);" << endl;
-    os << "\treturn " << className << "(iss);" << endl;
-    os << "}" << endl;
-    os << endl;
-
-    //string cast operator
-    os << className << "::operator std::string () const {" << endl;
-    os << "\tostringstream oss;" << endl;
-    os << "\toss << *this;" << endl;
-    os << "\treturn oss.str();" << endl;
-    os << "}" << endl;
-    os << endl;
-
-    //getName()
-    os << "std::string " << className << "::getName() const {" << endl;
-    os << "\treturn \"" << className << "\";" << endl;
-    os << "}" << endl;
-    os << endl;
-
-    //getNamespace()
-    os << "std::string " << className << "::getNamespace() const {" << endl;
-    os << "\treturn \"" << name.first << "\";" << endl;
-    os << "}" << endl;
-    os << endl;
-
-    os << "void " << className << "::appendChildren(xercesc::DOMElement *" << nodeWithPostfix << ") const {" << endl;
+	//append_children()
     os << generateAppender();
-    os << "}" << endl << endl;
 
-    os << "void " << className << "::parseNode(xercesc::DOMElement *" << nodeWithPostfix << ") {" << endl;
+	//parse_node()
     os << generateParser() << endl;
-    os << "}" << endl << endl;
+
+    set<string> classesToInclude = getIncludedClasses();
+    for(set<string>::const_iterator it = classesToInclude.begin(); it != classesToInclude.end(); it++)
+    	os << "from " << *it << " import *" << endl;
+
+    set<string> classesToPrototype = getPrototypeClasses();
+    for(set<string>::const_iterator it = classesToPrototype.begin(); it != classesToPrototype.end(); it++)
+    	if(*it != className)
+			os << "from " << *it << " import *" << endl;
 }
 
 set<string> Class::getIncludedClasses() const {
@@ -585,66 +584,27 @@ bool Class::Constructor::hasSameSignature(const Constructor& other) const {
 void Class::Constructor::writePrototype(ostream &os, bool withSemicolon) const {
     list<Member> all = getAllArguments();
 
-    os << cl->getClassname() << "(";
+    os << t << "def __init__" << "(self, ";
 
     for(list<Member>::const_iterator it = all.begin(); it != all.end(); it++) {
         if(it != all.begin())
             os << ", ";
-
-        if(it->isArray())
-            os << "const std::vector<";
-        else if(it->cl->shouldUseConstReferences())
-            os << "const ";
-
-        os << it->cl->getClassname();
-
-        if(it->isArray())
-            os << " >&";
-        else if(it->cl->shouldUseConstReferences())
-            os << "&";
-
-        os << " " << it->name;
+	    
+		os << it->name << " = None";
     }
 
-    os << ")";
-
-    if(withSemicolon)
-        os << ";";
+    os << "):" << endl;
 }
 
 void Class::Constructor::writeBody(ostream &os) const {
     list<Member> all = getAllArguments();
-
-    os << cl->getClassname() << "::";
-
     writePrototype(os, false);
-
-    if(all.size() > 0 || (cl->base && !cl->base->isSimple()))
-        os << " :" << endl << "\t";
-
-    bool hasParens = false;
-
-    if(cl->base && !cl->base->isSimple()) {
-        //pass the base class' elements
-        os << cl->base->getClassname() << "(";
-
-        for(list<Member>::const_iterator it = baseArgs.begin(); it != baseArgs.end(); it++) {
-            if(it != baseArgs.begin())
-                os << ", ";
-
-            os << it->name;
-        }
-
-        os << ")";
-        hasParens = true;
+	
+    for(list<Member>::const_iterator it = all.begin(); it != all.end(); it++) {
+	   	os << t << t << "self." << it->name << " = " << it->name << endl;
+		if(it->isArray()) {
+			os << t << t << "if self." << it->name << " == None:" << endl;
+			os << t << t << t << "self." << it->name << " = []" << endl;
+		}
     }
-
-    for(list<Member>::const_iterator it = ourArgs.begin(); it != ourArgs.end(); it++) {
-        if(hasParens || it != ourArgs.begin())
-            os << ", ";
-
-        os << it->name << "(" << it->name << ")";
-    }
-
-    os << " {" << endl << "}" << endl;
 }

@@ -71,8 +71,43 @@ static shared_ptr<Class> addClass(shared_ptr<Class> cl, map<FullName, shared_ptr
 //set of C++ keywords. initialized by initKeywordSet()
 set<string> keywordSet;
 
-//raw list of C++ keywords
+//raw list of python keywords
 const char *keywords[] = {
+    "and",
+    "del",
+    "for",
+    "is",
+    "raise",
+    "assert",
+    "elif",
+    "from",
+    "lambda",
+    "return", 
+    "break",
+    "else",
+    "global",
+    "not",
+    "try",
+    "class",
+    "except",
+    "if",
+    "or",
+    "while",
+    "continue",
+    "exec",
+    "import",
+    "pass",
+    "yield",
+    "def",
+    "finally",
+    "in",
+    "print",
+    "as",
+    "None",
+};
+
+//raw list of C++ keywords
+/*const char *keywords[] = {
     "and",
     "and_eq",
     "asm",
@@ -148,6 +183,8 @@ const char *keywords[] = {
     "xor",
     "xor_eq",
 };
+*/
+
 
 static void initKeywordSet() {
     //stuff keywords into keywordSet for fast lookup
@@ -729,10 +766,9 @@ int main(int argc, char** argv) {
         //dump the appenders and parsers of all non-build-in classes
         for(map<FullName, shared_ptr<Class> >::iterator it = classes.begin(); it != classes.end(); it++) {
             if(!it->second->isBuiltIn()) {
-                if(!it->second->isSimple())
                 {
                     ostringstream name, implementation;
-                    name << outputDir << "/" << it->first.second << ".cpp";
+                    name << outputDir << "/" << it->first.second << ".py";
 
                     //write implementation to memory, then diff against the possibly existing file
                     it->second->writeImplementation(implementation);
@@ -740,15 +776,6 @@ int main(int argc, char** argv) {
                     diffAndReplace(name.str(), implementation.str());
                 }
 
-                {
-                    ostringstream name, header;
-                    name << outputDir << "/" << it->first.second << ".h";
-
-                    //write header to memory, then diff against the possibly existing file
-                    it->second->writeHeader(header);
-
-                    diffAndReplace(name.str(), header.str());
-                }
             }
         }
 
