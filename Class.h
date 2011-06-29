@@ -148,23 +148,6 @@ public:
      */
     virtual std::string getClassname() const;
 
-    /**
-     * Returns name of header wherein the base class is defined.
-     */
-    virtual std::string getBaseHeader() const;
-
-    /**
-     * Returns whether this type has a header when it is the base of another class.
-     * Examples include normal complex types and certain built-in types like std::string.
-     */
-    virtual bool hasHeader() const;
-
-    /**
-     * Returns whether the constructor should take const references to this class or not.
-     * Counter cases include xs:int, xs:byte etc.
-     */
-    virtual bool shouldUseConstReferences() const;
-
     std::set<std::string> getIncludedClasses() const;
     std::set<std::string> getPrototypeClasses() const;
 
@@ -177,7 +160,6 @@ public:
     std::list<Member> getElements(bool includeBase, bool vectors, bool optionals) const;
 
     void writeImplementation(std::ostream& os) const;
-    void writeHeader(std::ostream& os) const;
 };
 
 #endif	/* _CLASS_H */
