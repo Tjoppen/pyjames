@@ -69,15 +69,3 @@ string BuiltInClass::generateMemberSetter(string memberName, string nodeName, st
 
     return oss.str();
 }
-
-string BuiltInClass::generateAttributeParser(string memberName, string attributeName, string tabs) const {
-    ostringstream oss;
-
-    oss << tabs << "{" << endl;
-    oss << tabs << "\tstringstream " << ssWithPostfix << ";" << endl;
-    oss << tabs << "\t" << ssWithPostfix << " << XercesString(" << attributeName << "->getValue());" << endl;
-    oss << tabs << "\t" << ssWithPostfix << " >> " << memberName << ";" << endl;
-    oss << tabs << "}" << endl;
-
-    return oss.str();
-}

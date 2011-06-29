@@ -139,11 +139,6 @@ public:
     virtual std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const;
 
     /**
-     * Should return a code fragment that parses the value of a DOMAttr into the named member.
-     */
-    virtual std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const;
-
-    /**
      * Should return the name with which to refer to this Class.
      */
     virtual std::string getClassname() const;

@@ -22,7 +22,6 @@ public:
     virtual std::string generateAttributeSetter(std::string memberName, std::string attributeName, std::string tabs) const;
     std::string generateParser() const;
     virtual std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const;
-    virtual std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const;
 };
 
 #define GENERATE_BUILTIN(name, xslName, classname)\
@@ -87,10 +86,6 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
 
         return oss.str();
     }
-
-    std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const {
-        return tabs + memberName + " = XercesString(" + attributeName + "->getValue());";
-    }
 };
 
 GENERATE_BUILTIN(FloatClass, "float", "float")};
@@ -124,18 +119,6 @@ GENERATE_BUILTIN(BooleanClass, "boolean", "bool")
 
     std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const {
         return tabs + memberName + " = bool(node.firstChild.nodeValue)";
-    }
-
-    std::string generateAttributeParser(std::string memberName, std::string attributeName, std::string tabs) const {
-        std::ostringstream oss;
-
-        oss << tabs << "{" << std::endl;
-        oss << tabs << "//TODO: Strip string prior to this?" << std::endl;
-        oss << tabs << "XercesString " << tempWithPostfix << "(" << attributeName << "->getValue());" << std::endl;
-        oss << tabs << memberName << " = " << tempWithPostfix << " == \"true\" || " << tempWithPostfix << " == \"1\";" << std::endl;
-        oss << tabs << "}" << std::endl;
-
-        return oss.str();
     }
 };
 

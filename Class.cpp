@@ -260,13 +260,6 @@ string Class::generateMemberSetter(string memberName, string nodeName, string ta
     return oss.str();
 }
 
-string Class::generateAttributeParser(string memberName, string attributeName, string tabs) const {
-    if(isSimple() && base)
-        return base->generateAttributeParser(memberName, attributeName, tabs);
-
-    throw runtime_error("Tried to generateAttributeParser() for a non-simple Class");
-}
-
 string Class::getClassname() const {
     return name.second;
 }
