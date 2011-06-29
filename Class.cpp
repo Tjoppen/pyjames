@@ -13,10 +13,6 @@
 using namespace std;
 
 extern bool verbose;
-extern bool generateDefaultCtor;
-extern bool generateRequiredCtor;
-extern bool generateRequiredAndVectorsCtor;
-extern bool generateAllCtor;
 
 const string variablePostfix = "_james";
 

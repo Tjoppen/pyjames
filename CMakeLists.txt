@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 2.6)
-project(james)
+project(pyjames)
 
 add_subdirectory(libjames)
 
-add_executable(james
+add_executable(pyjames
     main.cpp
     Class.cpp
     BuiltInClasses.cpp
 )
 
-target_link_libraries(james libjames)
+target_link_libraries(pyjames libjames)
 
 # Account for the Xerces-C++ 3.1.x library being called xerces-c_3 on WIN32
 if(WIN32)
-    target_link_libraries(james xerces-c_3)
+    target_link_libraries(pyjames xerces-c_3)
 else(WIN32)
-    target_link_libraries(james xerces-c)
+    target_link_libraries(pyjames xerces-c)
 endif(WIN32)
 
-install(TARGETS james DESTINATION bin)
+install(TARGETS pyjames DESTINATION bin)
 
