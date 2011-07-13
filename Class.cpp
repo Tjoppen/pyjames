@@ -61,6 +61,13 @@ void Class::doPostResolveInit() {
 
     if(constructors.size() == 0)
         throw runtime_error("No constructors in class " + getClassname());
+
+    //make sure members classes add us as their friend
+    for(std::list<Member>::iterator it = members.begin(); it != members.end(); it++) {
+        //there's no need to befriend ourselves
+        if(it->cl != this)
+            it->cl->friends.insert(getClassname());
+    }
 }
 
 std::list<Class::Member>::iterator Class::findMember(std::string name) {
@@ -431,6 +438,10 @@ bool Class::Constructor::hasSameSignature(const Constructor& other) const {
             return false;
 
     return true;
+}
+
+bool Class::Constructor::isDefaultConstructor() const {
+    return baseArgs.size() + ourArgs.size() == 0;
 }
 
 void Class::Constructor::writePrototype(ostream &os, bool withSemicolon) const {

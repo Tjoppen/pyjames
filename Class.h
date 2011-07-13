@@ -67,6 +67,11 @@ private:
          */
         bool hasSameSignature(const Constructor& other) const;
 
+        /**
+         * Returns true if this is a default constructor (meaning it takes no arguments).
+         */
+        bool isDefaultConstructor() const;
+
         void writePrototype(std::ostream &os, bool withSemicolon) const;
         void writeBody(std::ostream &os) const;
     };
@@ -74,6 +79,9 @@ private:
     std::list<Constructor> constructors;
 
     void addConstructor(const Constructor& constructor);
+
+    //classes that we should friend so they can access our default constructor
+    std::set<std::string> friends;
 
 public:
     enum ClassType {
