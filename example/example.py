@@ -1,3 +1,4 @@
+# This file is in the public domain.
 import sys
 from xml.dom.minidom import *
 from generated.PersonDocument import *
