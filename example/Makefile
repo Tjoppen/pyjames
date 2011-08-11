@@ -1,3 +1,4 @@
+# This file is in the public domain.
 all:
 	mkdir -p generated
 	pyjames generated example.xsd
