@@ -78,7 +78,7 @@ void Class::doPostResolveInit() {
     //make sure members classes add us as their friend
     for(std::list<Member>::iterator it = members.begin(); it != members.end(); it++) {
         //there's no need to befriend ourselves
-        if(it->cl != this)
+        if(it->cl && it->cl != this)
             it->cl->friends.insert(getClassname());
     }
 }
@@ -129,6 +129,9 @@ string Class::generateAppender() const {
         }
     } 
     for(std::list<Member>::const_iterator it = members.begin(); it != members.end(); it++) {
+        if (!it->cl)
+            continue;
+
         string name = it->name;
         string setterName = it->name;
         string nodeName = name + "Node";
@@ -208,6 +211,9 @@ string Class::generateParser() const {
     bool first = true;
 
     for(std::list<Member>::const_iterator it = members.begin(); it != members.end(); it++) {
+        if (!it->cl)
+            continue;
+
         if(!it->isAttribute) {
             if(first)
                 first = false;
@@ -247,6 +253,9 @@ string Class::generateParser() const {
 
     //attributes
     for(std::list<Member>::const_iterator it = members.begin(); it != members.end(); it++) {
+        if (!it->cl)
+            continue;
+
         if(it->isAttribute) {
 			oss << t << t << endl;
 			oss << t << t << "if node.hasAttribute(\"" << it->name << "\"):" << endl;
@@ -362,7 +371,7 @@ set<string> Class::getIncludedClasses() const {
 
     //return classes of any simple non-builtin elements and any required non-simple elements
     for(list<Member>::const_iterator it = members.begin(); it != members.end(); it++)
-        if((!it->cl->isBuiltIn() && it->cl->isSimple()) || (it->isRequired() && !it->cl->isSimple()))
+        if (it->cl && ((!it->cl->isBuiltIn() && it->cl->isSimple()) || (it->isRequired() && !it->cl->isSimple())))
             classesToInclude.insert(it->cl->getClassname());
 
     return classesToInclude;
@@ -374,7 +383,7 @@ set<string> Class::getPrototypeClasses() const {
 
     //return the classes of any non-simple non-required elements
     for(list<Member>::const_iterator it = members.begin(); it != members.end(); it++)
-        if(classesToInclude.find(it->cl->getClassname()) == classesToInclude.end() && !it->cl->isSimple() && !it->isRequired())
+        if(it->cl && classesToInclude.find(it->cl->getClassname()) == classesToInclude.end() && !it->cl->isSimple() && !it->isRequired())
             classesToPrototype.insert(it->cl->getClassname());
 
     return classesToPrototype;
@@ -447,7 +456,7 @@ bool Class::Constructor::hasSameSignature(const Constructor& other) const {
     //return false if the arguments in any position are of different types or
     //if one is an array but the other isn't
     for(; ita != a.end(); ita++, itb++)
-        if(ita->cl->getClassname() != itb->cl->getClassname() || ita->isArray() != itb->isArray())
+        if(ita->cl && (ita->cl->getClassname() != itb->cl->getClassname() || ita->isArray() != itb->isArray()))
             return false;
 
     return true;
@@ -463,6 +472,9 @@ void Class::Constructor::writePrototype(ostream &os, bool withSemicolon) const {
     os << t << "def __init__" << "(self, ";
 
     for(list<Member>::const_iterator it = all.begin(); it != all.end(); it++) {
+        if (!it->cl)
+            continue;
+
         if(it != all.begin())
             os << ", ";
 	    
@@ -477,6 +489,9 @@ void Class::Constructor::writeBody(ostream &os) const {
     writePrototype(os, false);
 	
     for(list<Member>::const_iterator it = all.begin(); it != all.end(); it++) {
+        if (!it->cl)
+            continue;
+
 	   	os << t << t << "self." << it->name << " = " << it->name << endl;
 		if(it->isArray()) {
 			os << t << t << "if self." << it->name << " == None:" << endl;
