@@ -1,0 +1,5 @@
+== pyJames ==
+
+A simple XML schema compiler for Python, written in C++
+
+Copyright 2011 CodeMill AB, in collaboration with Cantemo AB
