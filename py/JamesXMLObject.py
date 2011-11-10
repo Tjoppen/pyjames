@@ -52,7 +52,9 @@ class JamesXMLObject:
             return True
         return False
 
-
+    def strToHex(self, string):
+        import binascii
+        return binascii.unhexlify(string)
 
 def main():
     pass

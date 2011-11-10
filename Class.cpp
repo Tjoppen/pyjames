@@ -241,8 +241,10 @@ string Class::generateParser() const {
 				oss << "float(childNode.firstChild.nodeValue)";
             } else if(type == "boolean") {
             	oss << "self.strToBool(childNode.firstChild.nodeValue)";
-			} else if(type == "string" || type == "anyURI") {
-				oss << "str(childNode.firstChild.nodeValue)";
+            } else if(type == "hexBinary") {
+            	oss << "self.strToHex(childNode.firstChild.nodeValue)";
+	    } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
+	      oss << "str(childNode.firstChild.nodeValue)";
             } else {
                 oss << type << ".fromNode(childNode)";
             }
