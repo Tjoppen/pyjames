@@ -118,6 +118,10 @@ string Class::generateAppender() const {
 
 	oss << t << endl;
     oss << t << "def append_children(self, node, document):" << endl;
+
+    /* nop statement to handle a node with no children */
+    oss << t << t << "pass" << endl;
+
     if(base) {
         if(base->isSimple()) {
             //simpleContent
@@ -488,6 +492,9 @@ void Class::Constructor::writeBody(ostream &os) const {
     list<Member> all = getAllArguments();
     writePrototype(os, false);
 	
+    /* nop statement to handle a node with no children */
+    os << t << t << "pass" << endl;
+
     for(list<Member>::const_iterator it = all.begin(); it != all.end(); it++) {
         if (!it->cl)
             continue;

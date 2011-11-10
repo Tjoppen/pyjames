@@ -25,6 +25,8 @@
 
 using namespace std;
 
+const string t = "    "; // Python indentation step (four spaces)
+
 BuiltInClass::BuiltInClass(string name) : Class(FullName(XSL, name), Class::SIMPLE_TYPE) {
 }
 
@@ -66,7 +68,11 @@ string BuiltInClass::generateParser() const {
 string BuiltInClass::generateMemberSetter(string memberName, string nodeName, string tabs) const {
     ostringstream oss;
     
-    oss << tabs << memberName << " = ";
+    oss << tabs << "if node.firstChild == None:" << endl;
+    oss << tabs << t << memberName << " = None" << endl;
+    oss << tabs << "else:" << endl;
+
+    oss << tabs << t << memberName << " = ";
     string type = getClassname();
     if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
     	oss << "int(node.firstChild.nodeValue)";

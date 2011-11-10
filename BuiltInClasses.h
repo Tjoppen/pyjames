@@ -81,8 +81,15 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
 
     std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const {
         std::ostringstream oss;
+	
+	std::string t = "    ";
 
-        oss << tabs << memberName << " = ";
+
+	oss << tabs << "if node.firstChild == None:" << std::endl;
+	oss << tabs << t << memberName << " = None" << std::endl;
+	oss << tabs << "else:" << std::endl;
+
+        oss << tabs << t << memberName << " = ";
         std::string type = getClassname();
         if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
         	oss << "int(node.firstChild.nodeValue)";
