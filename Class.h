@@ -19,7 +19,7 @@
  */
 
 #ifndef _CLASS_H
-#define	_CLASS_H
+#define _CLASS_H
 
 #include <string>
 #include <map>
@@ -178,5 +178,5 @@ public:
     void writeImplementation(std::ostream& os) const;
 };
 
-#endif	/* _CLASS_H */
+#endif /* _CLASS_H */
 

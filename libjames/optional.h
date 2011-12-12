@@ -7,7 +7,7 @@
  */
 
 #ifndef _OPTIONAL_H
-#define	_OPTIONAL_H
+#define _OPTIONAL_H
 
 #include "Exceptions.h"
 
@@ -74,11 +74,11 @@ namespace james {
          * @deprecated Use optional::isSet() instead
          */
         james_attribute_deprecated operator bool () const {
-            return t;
+            return t != NULL;
         }
 
         bool isSet() const {
-            return t;
+            return t != NULL;
         }
 
         optional& operator = (const T& rhs) {
@@ -160,5 +160,5 @@ namespace james {
     };
 }
 
-#endif	/* _OPTIONAL_H */
+#endif /* _OPTIONAL_H */
 
