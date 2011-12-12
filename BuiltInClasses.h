@@ -73,34 +73,32 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
         std::ostringstream oss;
     
         oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
-    	oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
-    	oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
+        oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+        oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
     
         return oss.str();
     }
 
     std::string generateMemberSetter(std::string memberName, std::string nodeName, std::string tabs) const {
         std::ostringstream oss;
-	
-	std::string t = "    ";
+        std::string t = "    ";
 
-
-	oss << tabs << "if node.firstChild == None:" << std::endl;
-	oss << tabs << t << memberName << " = None" << std::endl;
-	oss << tabs << "else:" << std::endl;
+        oss << tabs << "if node.firstChild == None:" << std::endl;
+        oss << tabs << t << memberName << " = None" << std::endl;
+        oss << tabs << "else:" << std::endl;
 
         oss << tabs << t << memberName << " = ";
         std::string type = getClassname();
         if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
-        	oss << "int(node.firstChild.nodeValue)";
+            oss << "int(node.firstChild.nodeValue)";
         } else if(type == "long" || type == "unsignedLong") {
-        	oss << "long(node.firstChild.nodeValue)";
+            oss << "long(node.firstChild.nodeValue)";
         } else if(type == "float" || type == "double") {
-        	oss << "float(node.firstChild.nodeValue)";
+            oss << "float(node.firstChild.nodeValue)";
         } else if(type == "string") {
-        	oss << "node.firstChild.nodeValue";
+            oss << "node.firstChild.nodeValue";
         } else {
-        	oss << "str(node.firstChild.nodeValue)";
+            oss << "str(node.firstChild.nodeValue)";
         }
         oss << std::endl;
 
@@ -131,8 +129,8 @@ GENERATE_BUILTIN(BooleanClass, "boolean", "bool")
         std::ostringstream oss;
     
         oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
-    	oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
-    	oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
+        oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+        oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
     
         return oss.str();
     }

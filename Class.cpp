@@ -116,7 +116,7 @@ void Class::addMember(Member memberInfo) {
 string Class::generateAppender() const {
     ostringstream oss;
 
-	oss << t << endl;
+    oss << t << endl;
     oss << t << "def append_children(self, node, document):" << endl;
 
     /* nop statement to handle a node with no children */
@@ -125,8 +125,8 @@ string Class::generateAppender() const {
     if(base) {
         if(base->isSimple()) {
             //simpleContent
-		    oss << t << t << "tmpText = document.createTextNode(str(self.content))" << endl;
-		    oss << t << t << "node.appendChild(tmpText)" << endl;
+            oss << t << t << "tmpText = document.createTextNode(str(self.content))" << endl;
+            oss << t << t << "node.appendChild(tmpText)" << endl;
         } else {
             //call base appender
             oss << t << t << base->getClassname() << ".append_children(self, node, document);" << endl;
@@ -145,22 +145,22 @@ string Class::generateAppender() const {
         if(it != members.begin())
             oss << endl;
 
-		if(it->isOptional()) {
+        if(it->isOptional()) {
             oss << et << "if self." << name << " != None:" << endl;
             et = et + t;
         }
         if(it->isArray()) {
             oss << et << "if len(self." << name << ") > 0:" << endl;
             et = et + t;
-			oss << et << "for value in self." << name << ":" << endl;
+            oss << et << "for value in self." << name << ":" << endl;
             subName = "value";
             et = et + t;
         } 
-       	
+           
         if(it->isAttribute) {
-    		//attribute
+            //attribute
             oss << it->cl->generateAttributeSetter(name, subName, et);
-		} else {
+        } else {
             //element
             oss << it->cl->generateElementSetter(subName, name, et);
         }
@@ -175,7 +175,7 @@ string Class::generateElementSetter(string memberName, string nodeName, string t
         return base->generateElementSetter(memberName, nodeName, tabs);
 
     oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << endl;
-	oss << tabs << "node.appendChild(tmp)" << endl;
+    oss << tabs << "node.appendChild(tmp)" << endl;
     oss << tabs << memberName << ".append_children(tmp, document)" << endl;
     return oss.str();
 }
@@ -192,7 +192,7 @@ string Class::generateParser() const {
     string childName = "child" + variablePostfix;
     string nameName = "name" + variablePostfix;
 
-	oss << t << endl;
+    oss << t << endl;
     oss << t << "def parse_node(self, node):" << endl;
 
     if(base) {
@@ -203,8 +203,8 @@ string Class::generateParser() const {
             oss << t << t << base->getClassname() << ".parse_node(self, node)" << endl;
         }
     }
-	
-	oss << endl;
+    
+    oss << endl;
     oss << t << t << "for childNode in node.childNodes:" << endl;
     oss << t << t << t << "if childNode.localName == None:" << endl;
     oss << t << t << t << t << "continue" << endl;
@@ -227,33 +227,33 @@ string Class::generateParser() const {
             oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE:" << endl;
             
             oss << t << t << t << t << "self." << it->name;
-			if(it->isArray()) {
-				oss << ".append(";
-			} else {
-				oss << " = ";
-			}
+            if(it->isArray()) {
+                oss << ".append(";
+            } else {
+                oss << " = ";
+            }
             string type = it->type.second;
             if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
-				oss << "int(childNode.firstChild.nodeValue)";
+                oss << "int(childNode.firstChild.nodeValue)";
             } else if(type == "long" || type == "unsignedLong") {
-				oss << "long(childNode.firstChild.nodeValue)";
+                oss << "long(childNode.firstChild.nodeValue)";
             } else if(type == "float" || type == "double") {
-				oss << "float(childNode.firstChild.nodeValue)";
+                oss << "float(childNode.firstChild.nodeValue)";
             } else if(type == "boolean") {
-            	oss << "self.strToBool(childNode.firstChild.nodeValue)";
+                oss << "self.strToBool(childNode.firstChild.nodeValue)";
             } else if(type == "hexBinary") {
-            	oss << "self.strToHex(childNode.firstChild.nodeValue)";
-	    } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
-	      oss << "str(childNode.firstChild.nodeValue)";
+                oss << "self.strToHex(childNode.firstChild.nodeValue)";
+            } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
+                oss << "str(childNode.firstChild.nodeValue)";
             } else {
                 oss << type << ".fromNode(childNode)";
             }
-			
-			if(it->isArray()) {
-				oss << ")" << endl;
-			} else {
-				oss << endl;
-			}
+
+            if(it->isArray()) {
+                oss << ")" << endl;
+            } else {
+                oss << endl;
+            }
         }
     }
 
@@ -263,21 +263,21 @@ string Class::generateParser() const {
             continue;
 
         if(it->isAttribute) {
-			oss << t << t << endl;
-			oss << t << t << "if node.hasAttribute(\"" << it->name << "\"):" << endl;
-			oss << t << t << t << "self." << it->name << " = ";
+            oss << t << t << endl;
+            oss << t << t << "if node.hasAttribute(\"" << it->name << "\"):" << endl;
+            oss << t << t << t << "self." << it->name << " = ";
 
             string type = it->type.second;
             if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
-				oss << "int(";
+                oss << "int(";
             } else if(type == "long" || type == "unsignedLong") {
-				oss << "long(";
+                oss << "long(";
             } else if(type == "float" || type == "double") {
-				oss << "float(";
+                oss << "float(";
             } else  {
-				oss << "str(";
+                oss << "str(";
             } 
-			oss << "node.getAttribute(\"" << it->name << "\"))" << endl;
+            oss << "node.getAttribute(\"" << it->name << "\"))" << endl;
         }
     }
 
@@ -301,75 +301,75 @@ string Class::getClassname() const {
 
 void Class::writeImplementation(ostream& os) const {
     ClassName className = name.second;
-	
-	os << "from JamesXMLObject import *" << endl;
+    
+    os << "from JamesXMLObject import *" << endl;
 
-	
-	// Create class with inheritance
+    
+    // Create class with inheritance
     if(isDocument) {
-		os << "from " << base->getClassname() << " import *" << endl << endl;
-    	os << "class " << className << "(" << base->getClassname() << ", JamesXMLObject):";
+        os << "from " << base->getClassname() << " import *" << endl << endl;
+        os << "class " << className << "(" << base->getClassname() << ", JamesXMLObject):";
     } else if(base && !base->isSimple()) {
-		os << "from " << base->getClassname() << " import *" << endl << endl;
-    	os << "class " << className << "(" << base->getClassname() << "):";
+        os << "from " << base->getClassname() << " import *" << endl << endl;
+        os << "class " << className << "(" << base->getClassname() << "):";
     } else {
-    	os << endl << "class " << className << "(JamesXMLObject):";
-	}
-	
+        os << endl << "class " << className << "(JamesXMLObject):";
+    }
+    
     //not much implementation needed for simple types
     if(isSimple()) {
-	    os << t << endl;
+        os << t << endl;
         os << t << "def __init__(self, content = None):" << endl;
         os << t << t << "self.content = content" << endl;
-	    os << t << endl;
+        os << t << endl;
         os << t << "def __str__(self):" << endl;
         os << t << t << "return str(self.content)" << endl;
-		
+        
     } else {
-		// Create constructor
-		os << t << endl;
-    	constructors.back().writeBody(os);
-	
-	}
-	//Factory methods
-	os << t << endl;
-	os << t << "@classmethod" << endl;
-	os << t << "def fromNode(cls, node):" << endl;
-	os << t << t << "obj = cls()" << endl;
-	os << t << t << "obj.parse_node(node)" << endl;
-	os << t << t << "return obj" << endl;
+        // Create constructor
+        os << t << endl;
+        constructors.back().writeBody(os);
+    
+    }
+    //Factory methods
+    os << t << endl;
+    os << t << "@classmethod" << endl;
+    os << t << "def fromNode(cls, node):" << endl;
+    os << t << t << "obj = cls()" << endl;
+    os << t << t << "obj.parse_node(node)" << endl;
+    os << t << t << "return obj" << endl;
 
-	os << t << endl;
-	os << t << "@classmethod" << endl;
-	os << t << "def fromXML(cls, filename):" << endl;
-	os << t << t << "obj = cls()" << endl;
-	os << t << t << "obj.parsexml(filename)" << endl;
-	os << t << t << "return obj" << endl;
+    os << t << endl;
+    os << t << "@classmethod" << endl;
+    os << t << "def fromXML(cls, filename):" << endl;
+    os << t << t << "obj = cls()" << endl;
+    os << t << t << "obj.parsexml(filename)" << endl;
+    os << t << t << "return obj" << endl;
 
     //get_name()
-	os << t << endl;
+    os << t << endl;
     os << t << "def " << "get_name(self):" << endl;
     os << t << t <<"return \"" << className << "\"" << endl;
 
     //get_namespace()
-	os << t << endl;
+    os << t << endl;
     os << t << "def " << "get_namespace(self):" << endl;
     os << t << t <<"return \"" << name.first << "\"" << endl;
 
-	//append_children()
+    //append_children()
     os << generateAppender();
 
-	//parse_node()
+    //parse_node()
     os << generateParser() << endl;
 
     set<string> classesToInclude = getIncludedClasses();
     for(set<string>::const_iterator it = classesToInclude.begin(); it != classesToInclude.end(); it++)
-    	os << "from " << *it << " import *" << endl;
+        os << "from " << *it << " import *" << endl;
 
     set<string> classesToPrototype = getPrototypeClasses();
     for(set<string>::const_iterator it = classesToPrototype.begin(); it != classesToPrototype.end(); it++)
-    	if(*it != className)
-			os << "from " << *it << " import *" << endl;
+        if(*it != className)
+            os << "from " << *it << " import *" << endl;
 }
 
 set<string> Class::getIncludedClasses() const {
@@ -483,8 +483,8 @@ void Class::Constructor::writePrototype(ostream &os, bool withSemicolon) const {
 
         if(it != all.begin())
             os << ", ";
-	    
-		os << it->name << " = None";
+        
+        os << it->name << " = None";
     }
 
     os << "):" << endl;
@@ -493,7 +493,7 @@ void Class::Constructor::writePrototype(ostream &os, bool withSemicolon) const {
 void Class::Constructor::writeBody(ostream &os) const {
     list<Member> all = getAllArguments();
     writePrototype(os, false);
-	
+    
     /* nop statement to handle a node with no children */
     os << t << t << "pass" << endl;
 
@@ -501,10 +501,10 @@ void Class::Constructor::writeBody(ostream &os) const {
         if (!it->cl)
             continue;
 
-	   	os << t << t << "self." << it->name << " = " << it->name << endl;
-		if(it->isArray()) {
-			os << t << t << "if self." << it->name << " == None:" << endl;
-			os << t << t << t << "self." << it->name << " = []" << endl;
-		}
+           os << t << t << "self." << it->name << " = " << it->name << endl;
+        if(it->isArray()) {
+            os << t << t << "if self." << it->name << " == None:" << endl;
+            os << t << t << t << "self." << it->name << " = []" << endl;
+        }
     }
 }

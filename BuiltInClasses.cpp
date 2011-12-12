@@ -55,8 +55,8 @@ string BuiltInClass::generateAttributeSetter(string memberName, string attribute
     ostringstream oss;
 
     oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << endl;
-	oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << endl;
-	oss << tabs << "node.setAttributeNode(tmpAttr)" << endl;
+    oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << endl;
+    oss << tabs << "node.setAttributeNode(tmpAttr)" << endl;
 
     return oss.str();
 }
@@ -75,15 +75,15 @@ string BuiltInClass::generateMemberSetter(string memberName, string nodeName, st
     oss << tabs << t << memberName << " = ";
     string type = getClassname();
     if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
-    	oss << "int(node.firstChild.nodeValue)";
+        oss << "int(node.firstChild.nodeValue)";
     } else if(type == "long" || type == "unsignedLong") {
-    	oss << "long(node.firstChild.nodeValue)";
+        oss << "long(node.firstChild.nodeValue)";
     } else if(type == "float" || type == "double") {
-    	oss << "float(node.firstChild.nodeValue)";
+        oss << "float(node.firstChild.nodeValue)";
     } else if(type == "string") {
-       	oss << "node.firstChild.nodeValue";
+        oss << "node.firstChild.nodeValue";
     } else {
-    	oss << "str(node.firstChild.nodeValue)";
+        oss << "str(node.firstChild.nodeValue)";
     } 
 
     return oss.str();
