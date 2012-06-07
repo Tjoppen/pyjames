@@ -233,7 +233,7 @@ string Class::generateParser() const {
                 oss << " = ";
             }
             string type = it->type.second;
-            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte" || type == "integer" || type == "unsignedInteger") {
                 oss << "int(childNode.firstChild.nodeValue)";
             } else if(type == "long" || type == "unsignedLong") {
                 oss << "long(childNode.firstChild.nodeValue)";
@@ -268,7 +268,7 @@ string Class::generateParser() const {
             oss << t << t << t << "self." << it->name << " = ";
 
             string type = it->type.second;
-            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte" || type == "integer" || type == "unsignedInteger") {
                 oss << "int(";
             } else if(type == "long" || type == "unsignedLong") {
                 oss << "long(";

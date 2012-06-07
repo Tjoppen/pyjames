@@ -89,7 +89,7 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
 
         oss << tabs << t << memberName << " = ";
         std::string type = getClassname();
-        if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte") {
+        if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte" || type == "integer" || type == "unsignedInteger") {
             oss << "int(node.firstChild.nodeValue)";
         } else if(type == "long" || type == "unsignedLong") {
             oss << "long(node.firstChild.nodeValue)";
