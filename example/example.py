@@ -6,7 +6,7 @@ from generated.PersonListDocument import *
 
 def main():
     #unmarshal personIn from stdin
-    personIn = PersonDocument.fromXML(sys.stdin)
+    personIn = PersonDocument.fromxml(sys.stdin)
 
     #create a list containing personIn and some other person
     list = PersonListDocument()
