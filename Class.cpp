@@ -224,7 +224,7 @@ string Class::generateParser() const {
             else
                 oss << endl;
 
-            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE:" << endl;
+            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE and childNode.firstChild != None:" << endl;
             
             oss << t << t << t << t << "self." << it->name;
             if(it->isArray()) {
