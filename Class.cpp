@@ -346,6 +346,13 @@ void Class::writeImplementation(ostream& os) const {
     os << t << t << "obj.parsexml(filename)" << endl;
     os << t << t << "return obj" << endl;
 
+    os << t << endl;
+    os << t << "@classmethod" << endl;
+    os << t << "def fromString(cls, str):" << endl;
+    os << t << t << "obj = cls()" << endl;
+    os << t << t << "obj.parseString(str)" << endl;
+    os << t << t << "return obj" << endl;
+
     //get_name()
     os << t << endl;
     os << t << "def " << "get_name(self):" << endl;
