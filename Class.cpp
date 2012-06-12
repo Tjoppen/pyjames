@@ -331,28 +331,6 @@ void Class::writeImplementation(ostream& os) const {
         constructors.back().writeBody(os);
     
     }
-    //Factory methods
-    os << t << endl;
-    os << t << "@classmethod" << endl;
-    os << t << "def fromNode(cls, node):" << endl;
-    os << t << t << "obj = cls()" << endl;
-    os << t << t << "obj.parse_node(node)" << endl;
-    os << t << t << "return obj" << endl;
-
-    os << t << endl;
-    os << t << "@classmethod" << endl;
-    os << t << "def fromxml(cls, filename):" << endl;
-    os << t << t << "obj = cls()" << endl;
-    os << t << t << "obj.parsexml(filename)" << endl;
-    os << t << t << "return obj" << endl;
-
-    os << t << endl;
-    os << t << "@classmethod" << endl;
-    os << t << "def fromString(cls, str):" << endl;
-    os << t << t << "obj = cls()" << endl;
-    os << t << t << "obj.parseString(str)" << endl;
-    os << t << t << "return obj" << endl;
-
     //get_name()
     os << t << endl;
     os << t << "def " << "get_name(self):" << endl;

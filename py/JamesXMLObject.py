@@ -29,6 +29,24 @@ class JamesXMLObject:
         self.append_children(root_node, newdoc)
         return newdoc.toxml("UTF-8")
 
+    @classmethod
+    def fromNode(cls, node):
+        obj = cls()
+        obj.parse_node(node)
+        return obj
+
+    @classmethod
+    def fromxml(cls, filename):
+        obj = cls()
+        obj.parsexml(filename)
+        return obj
+
+    @classmethod
+    def fromString(cls, str):
+        obj = cls()
+        obj.parseString(str)
+        return obj
+
     def parseString(self, str):
         dom = parseString(str)
         self.parsedom(dom)
