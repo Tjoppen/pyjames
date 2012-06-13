@@ -224,7 +224,32 @@ string Class::generateParser() const {
             else
                 oss << endl;
 
-            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE and childNode.firstChild != None:" << endl;
+            string type = it->type.second, convStr;
+            bool isBasic = true;
+
+            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte" || type == "integer" || type == "unsignedInteger") {
+                convStr = "int(childNode.firstChild.nodeValue)";
+            } else if(type == "long" || type == "unsignedLong") {
+                convStr = "long(childNode.firstChild.nodeValue)";
+            } else if(type == "float" || type == "double") {
+                convStr = "float(childNode.firstChild.nodeValue)";
+            } else if(type == "boolean") {
+                convStr = "self.strToBool(childNode.firstChild.nodeValue)";
+            } else if(type == "hexBinary") {
+                convStr = "self.strToHex(childNode.firstChild.nodeValue)";
+            } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
+                convStr = "str(childNode.firstChild.nodeValue)";
+            } else {
+                isBasic = false;
+                convStr = type + ".fromNode(childNode)";
+            }
+
+            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE";
+
+            if (isBasic)
+                oss << " and childNode.firstChild != None:" << endl;
+            else
+                oss << ":" << endl;
             
             oss << t << t << t << t << "self." << it->name;
             if(it->isArray()) {
@@ -232,23 +257,9 @@ string Class::generateParser() const {
             } else {
                 oss << " = ";
             }
-            string type = it->type.second;
-            if(type == "int" || type == "short" || type == "unsignedShort" || type == "unsignedInt" || type == "byte" || type == "unsignedByte" || type == "integer" || type == "unsignedInteger") {
-                oss << "int(childNode.firstChild.nodeValue)";
-            } else if(type == "long" || type == "unsignedLong") {
-                oss << "long(childNode.firstChild.nodeValue)";
-            } else if(type == "float" || type == "double") {
-                oss << "float(childNode.firstChild.nodeValue)";
-            } else if(type == "boolean") {
-                oss << "self.strToBool(childNode.firstChild.nodeValue)";
-            } else if(type == "hexBinary") {
-                oss << "self.strToHex(childNode.firstChild.nodeValue)";
-            } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
-                oss << "str(childNode.firstChild.nodeValue)";
-            } else {
-                oss << type << ".fromNode(childNode)";
-            }
 
+            oss << convStr;
+            
             if(it->isArray()) {
                 oss << ")" << endl;
             } else {
