@@ -109,6 +109,9 @@ const char *keywords[] = {
     "print",
     "as",
     "None",
+
+    //other "keywords"
+    "content",  //complexTypes with simpleContent
 };
 
 static void initKeywordSet() {
