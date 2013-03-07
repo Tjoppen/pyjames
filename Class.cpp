@@ -125,7 +125,7 @@ string Class::generateAppender() const {
     if(base) {
         if(base->isSimple()) {
             //simpleContent
-            oss << t << t << "tmpText = document.createTextNode(str(self.content))" << endl;
+            oss << t << t << "tmpText = document.createTextNode(unicode(self.content))" << endl;
             oss << t << t << "node.appendChild(tmpText)" << endl;
         } else {
             //call base appender
@@ -238,7 +238,7 @@ string Class::generateParser() const {
             } else if(type == "hexBinary") {
                 convStr = "self.strToHex(childNode.firstChild.nodeValue)";
             } else if(type == "string" || type == "anyURI" || type == "dateTime" || type == "date" || type == "time" || type == "language") {
-                convStr = "str(childNode.firstChild.nodeValue)";
+                convStr = "unicode(childNode.firstChild.nodeValue)";
             } else {
                 isBasic = false;
                 convStr = type + ".fromNode(childNode)";
@@ -286,7 +286,7 @@ string Class::generateParser() const {
             } else if(type == "float" || type == "double") {
                 oss << "float(";
             } else  {
-                oss << "str(";
+                oss << "unicode(";
             } 
             oss << "node.getAttribute(\"" << it->name << "\"))" << endl;
         }
@@ -334,7 +334,7 @@ void Class::writeImplementation(ostream& os) const {
         os << t << t << "self.content = content" << endl;
         os << t << endl;
         os << t << "def __str__(self):" << endl;
-        os << t << t << "return str(self.content)" << endl;
+        os << t << t << "return unicode(self.content)" << endl;
         
     } else {
         // Create constructor

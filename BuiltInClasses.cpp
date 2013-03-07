@@ -44,7 +44,7 @@ string BuiltInClass::generateAppender() const {
 string BuiltInClass::generateElementSetter(string memberName, string nodeName, string tabs) const {
     ostringstream oss;
     oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << endl;
-    oss << tabs << "tmpText = document.createTextNode(str(" << memberName << "))" << endl;
+    oss << tabs << "tmpText = document.createTextNode(unicode(" << memberName << "))" << endl;
     oss << tabs << "tmp.appendChild(tmpText)" << endl;
     oss << tabs << "node.appendChild(tmp)" << endl;
 
@@ -55,7 +55,7 @@ string BuiltInClass::generateAttributeSetter(string memberName, string attribute
     ostringstream oss;
 
     oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << endl;
-    oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << endl;
+    oss << tabs << "tmpAttr.value = unicode(" << attributeName << ")" << endl;
     oss << tabs << "node.setAttributeNode(tmpAttr)" << endl;
 
     return oss.str();
@@ -83,7 +83,7 @@ string BuiltInClass::generateMemberSetter(string memberName, string nodeName, st
     } else if(type == "string") {
         oss << "node.firstChild.nodeValue";
     } else {
-        oss << "str(node.firstChild.nodeValue)";
+        oss << "unicode(node.firstChild.nodeValue)";
     } 
 
     return oss.str();

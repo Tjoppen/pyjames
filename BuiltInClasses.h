@@ -62,7 +62,7 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
         std::ostringstream oss;
        
         oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << std::endl;
-        oss << tabs << "tmpText = document.createTextNode(str(" << memberName << "))" << std::endl;
+        oss << tabs << "tmpText = document.createTextNode(unicode(" << memberName << "))" << std::endl;
         oss << tabs << "tmp.appendChild(tmpText)" << std::endl;
         oss << tabs << "node.appendChild(tmp)" << std::endl;
     
@@ -73,7 +73,7 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
         std::ostringstream oss;
     
         oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
-        oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+        oss << tabs << "tmpAttr.value = unicode(" << attributeName << ")" << std::endl;
         oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
     
         return oss.str();
@@ -98,7 +98,7 @@ GENERATE_BUILTIN(StringClass, "string", "std::string")
         } else if(type == "string") {
             oss << "node.firstChild.nodeValue";
         } else {
-            oss << "str(node.firstChild.nodeValue)";
+            oss << "unicode(node.firstChild.nodeValue)";
         }
         oss << std::endl;
 
@@ -115,9 +115,9 @@ GENERATE_BUILTIN(BooleanClass, "boolean", "bool")
         
         oss << tabs << "tmp = document.createElement(\"" << nodeName << "\")" << std::endl;
         if(getClassname() == "bool") {
-            oss << tabs << "tmpText = document.createTextNode(str(" << memberName << ").lower())" << std::endl;
+            oss << tabs << "tmpText = document.createTextNode(unicode(" << memberName << ").lower())" << std::endl;
         } else {
-            oss << tabs << "tmpText = document.createTextNode(str(" << memberName << "))" << std::endl;
+            oss << tabs << "tmpText = document.createTextNode(unicode(" << memberName << "))" << std::endl;
         }
         oss << tabs << "tmp.appendChild(tmpText)" << std::endl;
         oss << tabs << "node.appendChild(tmp)" << std::endl;
@@ -129,7 +129,7 @@ GENERATE_BUILTIN(BooleanClass, "boolean", "bool")
         std::ostringstream oss;
     
         oss << tabs << "tmpAttr = document.createAttribute(\"" << memberName << "\")" << std::endl;
-        oss << tabs << "tmpAttr.value = str(" << attributeName << ")" << std::endl;
+        oss << tabs << "tmpAttr.value = unicode(" << attributeName << ")" << std::endl;
         oss << tabs << "node.setAttributeNode(tmpAttr)" << std::endl;
     
         return oss.str();
