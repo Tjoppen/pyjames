@@ -159,10 +159,10 @@ string Class::generateAppender() const {
            
         if(it->isAttribute) {
             //attribute
-            oss << it->cl->generateAttributeSetter(name, subName, et);
+            oss << it->cl->generateAttributeSetter(it->xmlName, subName, et);
         } else {
             //element
-            oss << it->cl->generateElementSetter(subName, name, et);
+            oss << it->cl->generateElementSetter(subName, it->xmlName, et);
         }
     }
 

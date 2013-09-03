@@ -245,7 +245,8 @@ static void parseSequence(DOMElement *parent, DOMElement *sequence, Class *cl, b
         XercesString typeStr("type");
         XercesString minOccursStr("minOccurs");
         XercesString maxOccursStr("maxOccurs");
-        string name = fixIdentifier(XercesString(child->getAttribute(XercesString("name"))));
+        string elementName = XercesString(child->getAttribute(XercesString("name")));
+        string identifierName = fixIdentifier(elementName);
 
         if(child->hasAttribute(minOccursStr)) {
             stringstream ss;
@@ -276,7 +277,8 @@ static void parseSequence(DOMElement *parent, DOMElement *sequence, Class *cl, b
             //has type == end point - add as member of cl
             Class::Member info;
 
-            info.name = name;
+            info.name = identifierName;
+            info.xmlName = elementName;
             //assume in same namespace for now
             info.type = toFullName(XercesString(child->getAttribute(typeStr)));
             info.minOccurs = minOccurs;
@@ -287,13 +289,14 @@ static void parseSequence(DOMElement *parent, DOMElement *sequence, Class *cl, b
         } else {
             //no type - anonymous subtype
             //generate name
-            FullName subName(cl->name.first, cl->name.second + "_" + (string)name);
+            FullName subName(cl->name.first, cl->name.second + "_" + identifierName);
 
             //expect <complexType> sub-tag
             parseComplexType(getExpectedChildElement(child, "complexType"), subName);
 
             Class::Member info;
-            info.name = name;
+            info.name = identifierName;
+            info.xmlName = elementName;
             info.type = subName;
             info.minOccurs = minOccurs;
             info.maxOccurs = maxOccurs;
@@ -361,7 +364,8 @@ static void parseComplexType(DOMElement *element, FullName fullName, Class *cl) 
             if(!child->hasAttribute(XercesString("name")))
                 throw runtime_error("<attribute> missing expected attribute 'name'");
 
-            string attributeName = fixIdentifier(XercesString(child->getAttribute(XercesString("name"))));
+            string attributeName = XercesString(child->getAttribute(XercesString("name")));
+            string identifierName = fixIdentifier(attributeName);
 
             FullName type = toFullName(XercesString(child->getAttribute(XercesString("type"))));
 
@@ -370,7 +374,8 @@ static void parseComplexType(DOMElement *element, FullName fullName, Class *cl) 
                 optional = true;
 
             Class::Member info;
-            info.name = attributeName;
+            info.name = identifierName;
+            info.xmlName = attributeName;
             info.type = type;
             info.isAttribute = true;
             info.minOccurs = optional ? 0 : 1;

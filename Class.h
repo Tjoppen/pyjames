@@ -46,6 +46,7 @@ public:
     class Member {
     public:
         std::string name;
+        std::string xmlName;
         FullName type;
         Class *cl;          //NULL is class is unknown (only allowed for optionals and vectors)
         int minOccurs;
