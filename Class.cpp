@@ -125,8 +125,9 @@ string Class::generateAppender() const {
     if(base) {
         if(base->isSimple()) {
             //simpleContent
-            oss << t << t << "tmpText = document.createTextNode(unicode(self.content))" << endl;
-            oss << t << t << "node.appendChild(tmpText)" << endl;
+            oss << t << t << "if self.content != None:" << endl;
+            oss << t << t << t << "tmpText = document.createTextNode(unicode(self.content))" << endl;
+            oss << t << t << t << "node.appendChild(tmpText)" << endl;
         } else {
             //call base appender
             oss << t << t << base->getClassname() << ".append_children(self, node, document);" << endl;
