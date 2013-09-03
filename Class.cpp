@@ -244,7 +244,7 @@ string Class::generateParser() const {
                 convStr = type + ".fromNode(childNode)";
             }
 
-            oss << t << t << t << "if childNode.localName == \"" << it->name << "\" and childNode.nodeType == Node.ELEMENT_NODE";
+            oss << t << t << t << "if childNode.localName == \"" << it->xmlName << "\" and childNode.nodeType == Node.ELEMENT_NODE";
 
             if (isBasic)
                 oss << " and childNode.firstChild != None:" << endl;
@@ -275,7 +275,7 @@ string Class::generateParser() const {
 
         if(it->isAttribute) {
             oss << t << t << endl;
-            oss << t << t << "if node.hasAttribute(\"" << it->name << "\"):" << endl;
+            oss << t << t << "if node.hasAttribute(\"" << it->xmlName << "\"):" << endl;
             oss << t << t << t << "self." << it->name << " = ";
 
             string type = it->type.second;
@@ -288,7 +288,7 @@ string Class::generateParser() const {
             } else  {
                 oss << "unicode(";
             } 
-            oss << "node.getAttribute(\"" << it->name << "\"))" << endl;
+            oss << "node.getAttribute(\"" << it->xmlName << "\"))" << endl;
         }
     }
 
