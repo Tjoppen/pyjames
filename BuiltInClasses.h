@@ -149,6 +149,7 @@ GENERATE_BUILTIN_ALIAS(TimeClass, StringClass, "time")};
 GENERATE_BUILTIN_ALIAS(DateClass, StringClass, "date")};
 GENERATE_BUILTIN_ALIAS(DateTimeClass, StringClass, "dateTime")};
 GENERATE_BUILTIN_ALIAS(LanguageClass, StringClass, "language")};
+GENERATE_BUILTIN_ALIAS(DecimalClass, FloatClass, "decimal")};
 
 #endif /* _BUILTINCLASSES_H */
 

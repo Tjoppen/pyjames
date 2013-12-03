@@ -665,6 +665,7 @@ int main_wrapper(int argc, char** argv) {
         addClass(new BooleanClass);
         addClass(new LanguageClass);
         addClass(new HexBinaryClass);
+        addClass(new DecimalClass);
 
         string outputDir = argv[1];
         vector<string> schemaNames;
