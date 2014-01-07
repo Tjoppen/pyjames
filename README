@@ -1,5 +1,6 @@
 pyjames - A simple XML schema compiler for Python, written in C++
-This is a fork of james initially created by Ludvig Widman
+This is a fork of james (by Tomas Härdin), while the fork itself was initially
+created by Ludvig Widman
 
 Purpose/goals
 =============
